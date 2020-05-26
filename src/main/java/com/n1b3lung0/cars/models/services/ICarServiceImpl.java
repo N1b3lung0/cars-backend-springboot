@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ICarServiceImpl implements ICarService {
@@ -18,5 +19,23 @@ public class ICarServiceImpl implements ICarService {
     @Transactional(readOnly = true)
     public List<Car> findAll() {
         return (List<Car>) carDao.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Car findById(Long id) {
+        return carDao.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public Car save(Car car) {
+        return carDao.save(car);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        carDao.deleteById(id);
     }
 }
