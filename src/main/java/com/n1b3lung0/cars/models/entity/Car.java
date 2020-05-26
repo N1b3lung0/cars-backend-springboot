@@ -23,5 +23,10 @@ public class Car implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date createAt;
 
+    @PrePersist
+    public void prePersist() {
+        createAt = new Date();
+    }
+
     private static final long serialVersionUID = 1L;
 }
