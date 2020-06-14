@@ -32,12 +32,7 @@ public class CarRestController {
 
     @PutMapping(value="/{id}")
     public Car update(@RequestBody Car car, @PathVariable Long id) {
-        Car carToUpdate = carService.findById(id);
-
-        carToUpdate.setName(car.getName());
-        carToUpdate.setBrand(car.getBrand());
-
-        return carService.save(carToUpdate);
+        return carService.save(car.UpdateCar(carService.findById(id), car));
     }
 
     @DeleteMapping(value="{id}")
