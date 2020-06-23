@@ -3,6 +3,8 @@ package com.n1b3lung0.cars.models.services;
 import com.n1b3lung0.cars.models.dao.ICarDao;
 import com.n1b3lung0.cars.models.entity.Car;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,10 @@ public class ICarServiceImpl implements ICarService {
     public List<Car> findAll() {
         return (List<Car>) carDao.findAll();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Car> findAll(Pageable pageable) { return carDao.findAll(pageable); }
 
     @Override
     @Transactional(readOnly = true)
