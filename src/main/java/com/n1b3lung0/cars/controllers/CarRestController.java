@@ -2,11 +2,9 @@ package com.n1b3lung0.cars.controllers;
 
 import com.n1b3lung0.cars.models.entity.Car;
 import com.n1b3lung0.cars.models.services.ICarService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.n1b3lung0.cars.models.services.IUploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,16 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = { "http://localhost:4200" })
@@ -38,7 +31,8 @@ public class CarRestController {
     @Autowired
     private ICarService carService;
 
-    private final Logger log = LoggerFactory.getLogger(CarRestController.class);
+    @Autowired
+    private IUploadFileService uploadFileService;
 
     @GetMapping(value = { "", "/" })
     public List<Car> index() {
@@ -131,13 +125,7 @@ public class CarRestController {
         try {
             Car car = carService.findById(id);
             String previousFileName = car.getPhoto();
-            if (previousFileName != null && previousFileName.length() > 0) {
-                Path previousFilePath = Paths.get("uploads").resolve(previousFileName).toAbsolutePath();
-                File previousFile = previousFilePath.toFile();
-                if (previousFile.exists() && previousFile.canRead()) {
-                    previousFile.delete();
-                }
-            }
+            uploadFileService.delete(previousFileName);
             carService.delete(id);
         } catch (DataAccessException e) {
             response.put("message", "Error trying to delete the car in the DB.");
@@ -154,11 +142,9 @@ public class CarRestController {
         Car car = carService.findById(id);
 
         if (!file.isEmpty()) {
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename().replace(" ", "");
-            Path filePath = Paths.get("uploads").resolve(fileName).toAbsolutePath();
-            log.info(filePath.toString());
+            String fileName = null;
             try {
-                Files.copy(file.getInputStream(), filePath);
+                fileName = uploadFileService.copy(file);
             } catch (IOException e) {
                 response.put("message", "Error trying to upload the image.");
                 response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
@@ -166,14 +152,8 @@ public class CarRestController {
             }
 
             String previousFileName = car.getPhoto();
-            if (previousFileName != null && previousFileName.length() > 0) {
-                Path previousFilePath = Paths.get("uploads").resolve(previousFileName).toAbsolutePath();
-                File previousFile = previousFilePath.toFile();
-                if (previousFile.exists() && previousFile.canRead()) {
-                    previousFile.delete();
-                }
-            }
 
+            uploadFileService.delete(previousFileName);
             car.setPhoto(fileName);
             carService.save(car);
 
@@ -185,17 +165,13 @@ public class CarRestController {
 
     @GetMapping(value="/uploads/img/{photoName:.+}")
     public ResponseEntity<Resource> getPhoto(@PathVariable String photoName) {
-        Path filePath = Paths.get("uploads").resolve(photoName).toAbsolutePath();
-        log.info(filePath.toString());
+
         Resource resource = null;
+
         try {
-            resource = new UrlResource(filePath.toUri());
+            resource = uploadFileService.load(photoName);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        }
-
-        if (!resource.exists() && !resource.isReadable()) {
-            throw new RuntimeException("There was an error trying to upload the image " + photoName);
         }
 
         HttpHeaders headers = new HttpHeaders();
