@@ -2,6 +2,7 @@ package com.n1b3lung0.cars.models.services;
 
 import com.n1b3lung0.cars.models.dao.ICarDao;
 import com.n1b3lung0.cars.models.entity.Car;
+import com.n1b3lung0.cars.models.entity.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +45,8 @@ public class ICarServiceImpl implements ICarService {
     public void delete(Long id) {
         carDao.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Region> findAllRegions() { return carDao.findAllRegions(); }
 }

@@ -1,6 +1,7 @@
 package com.n1b3lung0.cars.models.services;
 
 import com.n1b3lung0.cars.models.entity.Car;
+import com.n1b3lung0.cars.models.entity.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +15,5 @@ public interface ICarService {
     public Car findById(Long id);
     public Car save(Car car);
     public void delete(Long id);
+    public List<Region> findAllRegions();
 }

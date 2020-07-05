@@ -1,6 +1,7 @@
 package com.n1b3lung0.cars.controllers;
 
 import com.n1b3lung0.cars.models.entity.Car;
+import com.n1b3lung0.cars.models.entity.Region;
 import com.n1b3lung0.cars.models.services.ICarService;
 import com.n1b3lung0.cars.models.services.IUploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,5 +179,10 @@ public class CarRestController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
 
         return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/regions")
+    public List<Region> listRegions() {
+        return carService.findAllRegions();
     }
 }

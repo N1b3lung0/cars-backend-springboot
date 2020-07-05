@@ -1,5 +1,7 @@
 package com.n1b3lung0.cars.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -31,8 +33,11 @@ public class Car implements Serializable {
 
     private String photo;
 
-    //@PrePersist
-    //public void     prePersist()            { createAt = new Date(); }
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private Region region;
 
     public Long     getId()                     { return id; }
     public void     setId(Long id)              { this.id = id; }
@@ -44,10 +49,13 @@ public class Car implements Serializable {
     public void     setCreateAt(Date createAt)  { this.createAt = createAt; }
     public String   getPhoto()                  { return photo; }
     public void     setPhoto(String photo)      { this.photo = photo; }
+    public Region   getRegion()                 { return region; }
+    public void     setRegion(Region region)    { this.region = region; }
 
     public Car UpdateCar(Car carToUpdate, Car car) {
         carToUpdate.setName(car.getName());
         carToUpdate.setBrand(car.getBrand());
+        carToUpdate.setRegion(car.getRegion());
         return carToUpdate;
     }
 
