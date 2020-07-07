@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +46,7 @@ public class CarRestController {
         return carService.findAll(PageRequest.of(page, 3));
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @GetMapping(value="/{id}")
     public ResponseEntity<?> show(@PathVariable Long id) {
         Car car = null;
@@ -63,6 +65,7 @@ public class CarRestController {
         return new ResponseEntity<Car>(car, HttpStatus.OK);
     }
 
+    @Secured({"ROLE_ADMIN"})
     @PostMapping(value={ "", "/" })
     public ResponseEntity<?> create(@Valid @RequestBody Car car, BindingResult result)
     {
@@ -89,6 +92,7 @@ public class CarRestController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
     }
 
+    @Secured({"ROLE_ADMIN"})
     @PutMapping(value="/{id}")
     public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody Car car, BindingResult result, @PathVariable Long id) {
 
@@ -120,6 +124,7 @@ public class CarRestController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
     }
 
+    @Secured({"ROLE_ADMIN"})
     @DeleteMapping(value="/{id}")
     public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
@@ -137,6 +142,7 @@ public class CarRestController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PostMapping(value="/upload")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file, @RequestParam("id") Long id) {
         Map<String, Object> response = new HashMap<>();
@@ -181,6 +187,7 @@ public class CarRestController {
         return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
     }
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping(value = "/regions")
     public List<Region> listRegions() {
         return carService.findAllRegions();
