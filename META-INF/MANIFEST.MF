@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: com.n1b3lung0.cars.CarsApplication
+
